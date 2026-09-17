@@ -1,11 +1,19 @@
-// src/redux/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const storedUser = localStorage.getItem('authUser') || sessionStorage.getItem('authUser');
 
+let parsedUser = null;
+try {
+  if (storedUser && storedUser !== 'undefined') {
+    parsedUser = JSON.parse(storedUser);
+  }
+} catch (e) {
+  console.error("Failed to parse authUser from storage", e);
+}
+
 const initialState = {
-  user: storedUser ? JSON.parse(storedUser) : null,
-  isAuthenticated: !!storedUser
+  user: parsedUser,
+  isAuthenticated: !!parsedUser
 };
 
 const authSlice = createSlice({

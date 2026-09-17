@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { FiEdit, FiExternalLink, FiFolder, FiPlus, FiRefreshCw, FiSearch, FiTrash2, FiFileText, FiX, FiCopy } from 'react-icons/fi'
+import ReactMarkdown from 'react-markdown'
 import { createCollection, deleteCollection, deleteRequestFromCollection, getCollections, updateCollection, generateAiDocs } from '../services/Api'
 
 export default function Collections() {
@@ -347,7 +348,9 @@ export default function Collections() {
               </div>
             </div>
             <div className="flex-1 overflow-auto p-5 bg-slate-50">
-              <pre className="whitespace-pre-wrap break-words text-sm font-mono text-slate-800">{aiDocs.content}</pre>
+              <div className="prose prose-slate max-w-none text-sm">
+                <ReactMarkdown>{aiDocs.content}</ReactMarkdown>
+              </div>
             </div>
           </div>
         </div>

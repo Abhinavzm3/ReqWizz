@@ -123,7 +123,7 @@ const LandingPage = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           {/* Feature 4 */}
-          <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+          {/* <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             <div className="bg-yellow-100 p-3 rounded-lg inline-block mb-4">
               <FiZap className="text-yellow-600 text-2xl" />
             </div>
@@ -142,10 +142,10 @@ const LandingPage = () => {
                 <FiCheck className="text-green-500 mr-2" /> Performance metrics
               </li>
             </ul>
-          </div>
+          </div> */}
           
           {/* Feature 5 */}
-          <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+          {/* <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             <div className="bg-red-100 p-3 rounded-lg inline-block mb-4">
               <FiUser className="text-red-600 text-2xl" />
             </div>
@@ -164,12 +164,12 @@ const LandingPage = () => {
                 <FiCheck className="text-green-500 mr-2" /> Activity feeds
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+      {/* <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-extrabold text-white mb-4">Ready to see Wizard! ReqWiz</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
@@ -182,7 +182,7 @@ const LandingPage = () => {
             Start Testing Your API Now
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">

@@ -5,10 +5,11 @@ import {
   FiCopy, FiCode, FiMonitor, FiFileText, FiZap, FiX,
   FiCheckCircle, FiInfo, FiMaximize2, FiMinimize2, FiAlertTriangle
 } from 'react-icons/fi'
-import { generateAiTypes } from '../services/Api'
-import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL
+import axios from 'axios'
+import ReactMarkdown from 'react-markdown'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const AI_CHAR_LIMIT = 15_000 // max characters sent to Groq
@@ -94,67 +95,23 @@ function BugReport({ bugs, onClose }) {
           </button>
         </div>
         <div className="max-h-[70vh] overflow-auto p-5 text-sm text-slate-300">
-          <pre className="whitespace-pre-wrap font-sans leading-relaxed">{bugs}</pre>
+          <div className="prose prose-invert prose-sm max-w-none">
+            <ReactMarkdown>{bugs}</ReactMarkdown>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function TypesPanel({ types, onClose }) {
-  const [copied, setCopied] = useState(false)
-  if (!types) return null
-  const handleCopy = () => {
-    navigator.clipboard.writeText(types)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-  return (
-    <div className="absolute inset-0 z-20 flex items-start justify-center overflow-auto bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-700 bg-slate-800 px-5 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex gap-1.5">
-              <div className="h-3 w-3 rounded-full bg-rose-500" />
-              <div className="h-3 w-3 rounded-full bg-amber-500" />
-              <div className="h-3 w-3 rounded-full bg-emerald-500" />
-            </div>
-            <span className="ml-1 text-xs font-semibold text-slate-300">Generated TypeScript Interfaces</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopy}
-              className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition ${copied ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'}`}
-            >
-              {copied ? <FiCheckCircle size={12} /> : <FiCopy size={12} />}
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-            <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-white">
-              <FiX size={16} />
-            </button>
-          </div>
-        </div>
-        <div className="max-h-[70vh] overflow-auto">
-          <SyntaxHighlighter
-            language="typescript"
-            style={vscDarkPlus}
-            customStyle={{ margin: 0, padding: '1rem', background: 'transparent', fontSize: '13px', lineHeight: '1.6' }}
-          >
-            {types}
-          </SyntaxHighlighter>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // ── ViewerContent (shared between inline + fullscreen) ───────────────────────
 function ViewerContent({
   response, requestDetails, contentType, rawBody, isHtml, isJson,
   viewMode, setViewMode, iframeRef, tabs,
-  aiAction, handleAnalyzeBugs, handleExportTypes,
+  aiAction, handleAnalyzeBugs,
   handleCopyRaw, copied, statusBadge,
-  bugReport, setBugReport, typesPanel, setTypesPanel,
+  bugReport, setBugReport,
   sizeLimitWarning, setSizeLimitWarning, bodyLen,
   fullscreen, setFullscreen,
 }) {
@@ -187,19 +144,7 @@ function ViewerContent({
             }
           </button>
 
-          {/* ✨ Export Types */}
-          {isJson && (
-            <button
-              onClick={handleExportTypes}
-              disabled={isAiLoading}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-400 transition hover:bg-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {aiAction === 'types'
-                ? <><span className="h-3 w-3 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" /> Generating…</>
-                : <>✨ Export Types</>
-              }
-            </button>
-          )}
+
 
           {/* Copy */}
           <button
@@ -252,7 +197,7 @@ function ViewerContent({
         {aiAction && <AiLoadingOverlay action={aiAction} />}
 
         {bugReport  && <BugReport bugs={bugReport}   onClose={() => setBugReport(null)}  />}
-        {typesPanel && <TypesPanel types={typesPanel} onClose={() => setTypesPanel(null)} />}
+
 
         {/* Pretty */}
         {viewMode === 'pretty' && (
@@ -325,7 +270,7 @@ export default function ResponseViewer({ response, requestDetails }) {
   const [viewMode, setViewMode] = useState('pretty')
   const [aiAction, setAiAction] = useState(null)   // 'bugs' | 'types' | null
   const [bugReport, setBugReport]   = useState(null)
-  const [typesPanel, setTypesPanel] = useState(null)
+
   const [copied, setCopied]         = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [sizeLimitWarning, setSizeLimitWarning] = useState(false)
@@ -381,21 +326,7 @@ export default function ResponseViewer({ response, requestDetails }) {
     setAiAction(null)
   }
 
-  const handleExportTypes = async () => {
-    if (!isJson) return
-    if (isTooBig) {
-      setSizeLimitWarning(true)
-    }
-    setAiAction('types')
-    setTypesPanel(null)
-    try {
-      const { data } = await generateAiTypes(response?.body)
-      setTypesPanel(data.types)
-    } catch {
-      alert('Failed to generate TypeScript types.')
-    }
-    setAiAction(null)
-  }
+
 
   if (!response) return null
 
@@ -409,9 +340,9 @@ export default function ResponseViewer({ response, requestDetails }) {
   const sharedProps = {
     response, requestDetails, contentType, rawBody, isHtml, isJson,
     viewMode, setViewMode, iframeRef, tabs,
-    aiAction, handleAnalyzeBugs, handleExportTypes,
+    aiAction, handleAnalyzeBugs,
     handleCopyRaw, copied, statusBadge,
-    bugReport, setBugReport, typesPanel, setTypesPanel,
+    bugReport, setBugReport,
     sizeLimitWarning, setSizeLimitWarning, bodyLen,
     fullscreen, setFullscreen,
   }

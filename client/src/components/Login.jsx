@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import HandleGoogleLogin from './GoogleAuth';
-import { FcGoogle } from 'react-icons/fc';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -17,7 +15,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', formData, {
+      const res = await axios.post('http://localhost:5000/api/user/auth/login', formData, {
         withCredentials: true
       });
       toast.success('Login successful!');
@@ -71,24 +69,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue with</span>
-          </div>
-        </div>
 
-        <button
-          onClick={HandleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-100"
-        >
-          <FcGoogle size={24} className="shrink-0" />
-          <span className="text-gray-700 font-medium text-base">
-            Google
-          </span>
-        </button>
 
         <div className="mt-8 text-center">
           <p className="text-gray-600 text-sm">

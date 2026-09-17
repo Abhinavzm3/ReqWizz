@@ -1,6 +1,6 @@
 // src/services/api.js
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_API_URL 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 
 export const sendRequest = (data) => axios.post(`${API_URL}/send-request`, data);
@@ -23,3 +23,8 @@ export const generateAiRequest = (prompt) => axios.post(`${API_URL}/ai/generate-
 export const debugAiError = (requestDetails, errorResponse) => axios.post(`${API_URL}/ai/debug-error`, { requestDetails, errorResponse });
 export const generateAiTypes = (responseBody) => axios.post(`${API_URL}/ai/generate-types`, { responseBody });
 export const generateAiDocs = (collectionName, requests) => axios.post(`${API_URL}/ai/generate-docs`, { collectionName, requests });
+
+
+// Agent
+export const planAgentChain = (goal, baseUrl) => axios.post(`${API_URL}/agent/plan`, { goal, baseUrl });
+export const executeAgentChain = (steps, baseUrl) => axios.post(`${API_URL}/agent/execute`, { steps, baseUrl });

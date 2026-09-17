@@ -1,7 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import userReducer from './authSlice';
 
-
 import {
   persistReducer,
   FLUSH,
@@ -12,18 +11,29 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import storage from 'redux-persist/lib/storage';
+// Custom storage implementation to avoid ESM import issues with Vite
+const customStorage = {
+  getItem: (key) => {
+    return Promise.resolve(window.localStorage.getItem(key));
+  },
+  setItem: (key, value) => {
+    window.localStorage.setItem(key, value);
+    return Promise.resolve(value);
+  },
+  removeItem: (key) => {
+    window.localStorage.removeItem(key);
+    return Promise.resolve();
+  },
+};
 
 const persistConfig = {
   key: 'root',
   version: 1,
-  storage,
-  
+  storage: customStorage,
 };
 
 const rootReducer = combineReducers({
   auth: userReducer,
-
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -34,8 +44,6 @@ const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,'socket/setSocket'],
-
-        
       },
     }),
 });

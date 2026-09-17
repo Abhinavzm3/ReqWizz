@@ -1,7 +1,9 @@
 import Groq from 'groq-sdk';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const MODEL = 'llama-3.3-70b-versatile';
+const MODEL = 'openai/gpt-oss-20b';
 
 export const generateRequest = async (req, res) => {
   try {
@@ -65,33 +67,7 @@ Format your response in Markdown. Keep it brief and actionable.`;
   }
 };
 
-export const generateTypes = async (req, res) => {
-  try {
-    const { responseBody } = req.body;
-    
-    const prompt = `Convert the following JSON response into a set of TypeScript interfaces. Provide ONLY the TypeScript code, do not use markdown codeblocks.
 
-JSON Response:
-${JSON.stringify(responseBody, null, 2)}`;
-
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        { role: 'user', content: prompt }
-      ],
-      model: MODEL,
-    });
-
-    let types = chatCompletion.choices[0]?.message?.content || '';
-    if (types.startsWith('\`\`\`typescript')) types = types.replace(/\`\`\`typescript/g, '');
-    if (types.startsWith('\`\`\`')) types = types.replace(/\`\`\`/g, '');
-    types = types.replace(/\`\`\`$/g, '');
-
-    res.json({ types: types.trim() });
-  } catch (error) {
-    console.error('Groq generateTypes error:', error);
-    res.status(500).json({ error: 'Failed to generate types' });
-  }
-};
 
 export const generateDocs = async (req, res) => {
   try {
